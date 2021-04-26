@@ -1,0 +1,10 @@
+{
+  "DATA_ROOT": "",
+  "TRAINING_REL": "",
+  "TEST_REL": "",
+  "MODEL_ROOT": "",
+  "GENDERED_VOCAB_REL": "",
+  "MALE_VOCAB_REL": "",
+  "FEMALE_VOCAB_REL": "",
+  "PERSPECTIVE_API_REL": ""
+}

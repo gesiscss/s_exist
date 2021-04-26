@@ -131,3 +131,7 @@ dmypy.json
 
 # shared task data
 EXIST2021_dataset/
+# model binaries
+models/
+# config
+config.json
