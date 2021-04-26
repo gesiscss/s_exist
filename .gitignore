@@ -135,3 +135,4 @@ EXIST2021_dataset/
 models/
 # config
 config.json
+.idea/.gitignore
