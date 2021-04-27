@@ -150,10 +150,13 @@ def get_word_embeddings(docs, min_tok_freq=10, window_length=5, embedding_size=2
 
 if __name__ == '__main__':
     from nltk import word_tokenize
-    from utils import read_train
+    from utils import read_train, read_test
+    import pandas as pd
     from preprocessing import preprocess_for_embedding
     print('reading data')
-    df = read_train()
+    train = read_train(languages=['en'])
+    test = read_test(languages=['en'])
+    df = pd.concat((train, test))
 
     print('preprocessing')
     df['text'] = df.text.apply(preprocess_for_embedding)

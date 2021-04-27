@@ -154,14 +154,17 @@ def get_document_embeddings(all_data, model, words2idx, dim, unigram_counts, rmp
 if __name__ == "__main__":
     from pmi import get_word_embeddings
     from nltk import word_tokenize
-    from utils import read_train
+    from utils import read_train, read_test, build_feature_path
+    import pandas as pd
     from preprocessing import preprocess_for_embedding
 
     RNG = random.Random()
     RNG.seed(42)
 
     print('reading data')
-    df = read_train()
+    train = read_train(languages=['en'])
+    test = read_test(languages=['en'])
+    df = pd.concat((train, test))
 
     print('preprocessing')
     df['text'] = df.text.apply(preprocess_for_embedding)
@@ -173,3 +176,11 @@ if __name__ == "__main__":
     unigram_counts, id2tok, tok2id, word_vectors = get_word_embeddings(docs, embedding_size=d, window_length=3)
     print('generate document embeddings')
     doc_vectors = get_document_embeddings(df.text.values, word_vectors, tok2id, d, unigram_counts)
+    print(len(train), len(test), doc_vectors.shape)
+
+    sif_df = pd.DataFrame(doc_vectors, index=df.index)
+    sif_training_rel_path = build_feature_path('TRAINING_REL', 'sif')
+    sif_df.loc[train.index].to_csv(sif_training_rel_path)
+
+    sif_test_rel_path = build_feature_path('TEST_REL', 'sif')
+    sif_df.loc[test.index].to_csv(sif_test_rel_path)

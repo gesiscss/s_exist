@@ -5,6 +5,7 @@ from functools import partial
 import numpy as np
 import pandas as pd
 from minisom import MiniSom
+from scipy.sparse import csr_matrix
 from spacy.matcher import PhraseMatcher
 from spacy.tokens import Token
 from spacy.util import filter_spans
@@ -384,18 +385,28 @@ if __name__ == '__main__':
 
     for ngram in final_ngrams:
         print(format_ngram(ngram))
-    ## build a doc x sparse pattern matrix with the following code
-    # row_ind = list()
-    # col_ind = list()
-    # data = list()
-    # for doc_index, ngram_counts in doc2ngram.items():
-    #     for ngram_index, ngram_count in ngram_counts.items():
-    #         row_ind.append(doc_index)
-    #         col_ind.append(ngram_index)
-    #         data.append(ngram_count)
-    # (M, N) = (len(docs), len(final_ngrams))
-    # bag_of_dep_ngrams = csr_matrix((data, (row_ind, col_ind)), shape=(M, N))
+    # build a doc x sparse pattern matrix with the following code
+    row_ind = list()
+    col_ind = list()
+    data = list()
+    for doc_idx, ngram_counts in doc2ngram.items():
+        for ngram_index, ngram_count in ngram_counts.items():
+            row_ind.append(doc_idx)
+            col_ind.append(ngram_index)
+            data.append(ngram_count)
+    (M, N) = (len(docs), len(final_ngrams))
+    bag_of_dep_ngrams = csr_matrix((data, (row_ind, col_ind)), shape=(M, N))
 
+    print(M, N)
+
+    senpai_df = pd.DataFrame(bag_of_dep_ngrams.todense(), index=doc_index)
     senpai_training_rel_path = build_feature_path('TRAINING_REL', 'senpai')
-    with open(senpai_training_rel_path, 'w+') as f:
-        json.dump(dict(final_ngrams=final_ngrams, doc2ngram=doc2ngram, doc_index=doc_index), f)
+    senpai_df.loc[train.index].to_csv(senpai_training_rel_path)
+
+    senpai_test_rel_path = build_feature_path('TEST_REL', 'senpai')
+    senpai_df.loc[test.index].to_csv(senpai_test_rel_path)
+
+
+    # senpai_training_rel_path = build_feature_path('TRAINING_REL', 'senpai')
+    # with open(senpai_training_rel_path, 'w+') as f:
+    #     json.dump(dict(final_ngrams=final_ngrams, doc2ngram=doc2ngram, doc_index=doc_index), f)
