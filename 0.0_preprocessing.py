@@ -4,14 +4,13 @@ import string
 from bs4 import BeautifulSoup
 from functools import partial
 
-
 emoji_pattern = re.compile("["
                            u"\U0001F600-\U0001F64F"  # emoticons
                            u"\U0001F300-\U0001F5FF"  # symbols & pictographs
                            u"\U0001F680-\U0001F6FF"  # transport & map symbols
                            u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
                            "]+", flags=re.UNICODE | re.I | re.M | re.DOTALL)
-url_pattern = re.compile('(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?')
+url_pattern = re.compile(r'(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?')
 mention_pattern = re.compile(r'(^|\W)(?P<mention>(rt|ht|cc|[.] ?)?(@\w+|MENTION\d+))(\b|[' + string.punctuation + '])',
                              flags=re.I | re.M | re.DOTALL)
 hashtag_pattern = re.compile(r'(^|\W)(?P<hashtag>#\w+)(\b|[' + string.punctuation + '])', flags=re.I | re.M | re.DOTALL)
@@ -30,7 +29,7 @@ def replace_pattern(text, substitution, pattern, pattern_name):
     return new_text
 
 
-def detweet(text):
+def detweet(text): # TODO: might want to segment hashtags and mentions, or extract separate features
     text = re.sub(emoji_pattern, '', text)
     text = replace_pattern(text, '', hashtag_pattern, 'hashtag')
     text = replace_pattern(text, '', mention_pattern, 'mention')
@@ -41,13 +40,10 @@ def detweet(text):
 def normalize(text):
     return re.sub(r"\s+", " ",  # remove extra spaces
                   text).strip()
-    # return re.sub(r"\s+", " ",  # remove extra spaces
-    #               re.sub(r'[^a-zA-Z0-9]', ' ',  # remove non alphanumeric, incl punctuation
-    #                      text)).lower().strip()  # lowercase and strip
 
 
 def unescape(text):
-    return BeautifulSoup(text).get_text()
+    return BeautifulSoup(text, features="html.parser").get_text()
 
 
 def preprocess(text, fix_encoding=False):
