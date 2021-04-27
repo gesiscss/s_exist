@@ -170,7 +170,6 @@ if __name__ == "__main__":
     docs = list(map(word_tokenize, docs))
     print('generate word embeddings')
     d = 50  # dimension of word embeddings (and hence, document embeddings)
-    unigram_counts, id2tok, tok2id, word_vectors = get_word_embeddings(docs, embedding_size=d)
-    # do this on the whole df, not on the subsample
+    unigram_counts, id2tok, tok2id, word_vectors = get_word_embeddings(docs, embedding_size=d, window_length=3)
     print('generate document embeddings')
     doc_vectors = get_document_embeddings(df.text.values, word_vectors, tok2id, d, unigram_counts)

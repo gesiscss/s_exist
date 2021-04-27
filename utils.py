@@ -9,15 +9,17 @@ def read_config():
     return config
 
 
-def read_train():
+def read_train(languages=['es', 'en']):
     df = __read_data('TRAINING_REL', sep='\t',
                      usecols=['id', 'source', 'language', 'text', 'task1', 'task2'])
+    df = df[df.language.isin(languages)]
     return df.set_index('id')
 
 
-def read_test():
+def read_test(languages=['es', 'en']):
     df = __read_data('TEST_REL', sep='\t',
                      usecols=['id', 'source', 'language', 'text'])
+    df = df[df.language.isin(languages)]
     return df.set_index('id')
 
 
@@ -67,4 +69,4 @@ def read_perspective_key():
 
 def build_feature_path(dataset_key, feature_name):
     config = read_config()
-    return os.path.join(config['DATA_ROOT'], config[dataset_key], feature_name)
+    return os.path.join(config['DATA_ROOT'], config[dataset_key]+'.'+ feature_name)

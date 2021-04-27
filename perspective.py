@@ -73,7 +73,7 @@ def get_toxicity_scores(comments, API_KEY, max_retries=3, requested_attributes=R
                     retries += 1
                     time.sleep(60)
         scores.append(score)
-        time.sleep(.1)
+        time.sleep(1)
     return scores
 
 

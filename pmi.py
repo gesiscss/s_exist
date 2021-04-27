@@ -162,4 +162,4 @@ if __name__ == '__main__':
     docs = list(map(word_tokenize, docs))
     unigram_counts, id2tok, tok2id, pmis = get_word_embeddings(docs, window_length=3, embedding_size=50)
     print(ww_sim('feminazi', pmis, tok2id, id2tok))
-    print(ww_sim('women', pmis, tok2id, id2tok))
+    print(ww_sim('woman', pmis, tok2id, id2tok))

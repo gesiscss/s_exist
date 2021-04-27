@@ -5,6 +5,13 @@ from bs4 import BeautifulSoup
 from functools import partial
 
 import spacy
+import unicodedata
+import sys
+
+from numpy.ma.extras import isin
+
+tbl = dict.fromkeys(i for i in range(sys.maxunicode)
+                    if unicodedata.category(chr(i)).startswith('P'))
 
 __parser = None
 spacy_stopwords = None  # depends on the parser, should `load_spacy` before use
@@ -101,8 +108,8 @@ def preprocess_light(tweets, fix_encoding=False):
     return map(partial(_preprocess_light, fix_encoding=fix_encoding), tweets)
 
 
-def escape_punct(x):
-    return escape_punct_re.sub(' ', x)
+def escape_punct(text):
+    return text.translate(tbl)
 
 
 def preprocess_for_embedding(text, model_name='en_core_web_lg'):
@@ -114,9 +121,15 @@ def preprocess_for_embedding(text, model_name='en_core_web_lg'):
     return text
 
 
-def doc2token(txt, remove_punct=True, remove_digit=True, remove_stops=True, remove_pron=True, lemmatize=True):
-    parser = get_parser()
-    parsed = parser(txt)
+def doc2token(txt, remove_punct=True, remove_digit=True, remove_stops=True, remove_pron=True, lemmatize=True,
+              pos_blacklist=[]):
+    if type(txt) == str:
+        parser = get_parser()
+        parsed = parser(txt)
+    elif isinstance(txt, spacy.tokens.doc.Doc):
+        parsed = txt
+    else:
+        raise ValueError('txt should be str or spacy Doc')
     tokens = list()
     for token in parsed:
         if remove_punct and token.is_punct:
@@ -126,6 +139,8 @@ def doc2token(txt, remove_punct=True, remove_digit=True, remove_stops=True, remo
         if remove_stops and (token.lemma_ in spacy_stopwords):  # skip stopwords
             continue
         if remove_pron and (token.lemma_ == '-PRON-'):  # skip pronouns
+            continue
+        if token.pos_ in pos_blacklist:
             continue
         else:
             token = token.lemma_.lower() if lemmatize else token.orth_.lower()
