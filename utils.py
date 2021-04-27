@@ -10,31 +10,29 @@ def read_config():
 
 
 def read_train():
-    df = __read_data('TEST_REL', sep='\t',
+    df = __read_data('TRAINING_REL', sep='\t',
                      usecols=['id', 'source', 'language', 'text', 'task1', 'task2'])
-
     return df.set_index('id')
 
 
 def read_test():
     df = __read_data('TEST_REL', sep='\t',
                      usecols=['id', 'source', 'language', 'text'])
-
     return df.set_index('id')
 
 
 def read_male():
-    df = __read_data('MALE_VOCAB_REL', )
+    df = __read_data('MALE_VOCAB_REL')
     return df.values.ravel().tolist()
 
 
 def read_female():
-    df = __read_data('FEMALE_VOCAB_REL', )
+    df = __read_data('FEMALE_VOCAB_REL')
     return df.values.ravel().tolist()
 
 
 def read_gendered():
-    df = __read_data('GENDERED_VOCAB_REL', )
+    df = __read_data('GENDERED_VOCAB_REL')
     return df.values.ravel().tolist()
 
 
