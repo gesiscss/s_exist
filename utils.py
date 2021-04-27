@@ -45,7 +45,8 @@ def __read_data(rel_path_key, usecols=None, sep='\t'):
 
 def read_sexism(with_modifications=False):
     df = __read_data('SEXISM_REL', sep=',',
-                     usecols=['id', 'dataset', 'text', 'toxicity', 'sexist', 'scale', 'of_id'])
+                     usecols=['id', 'dataset', 'text', 'toxicity', 'sexist', 'sexist_content', 'sexist_phrasing',
+                              'scale', 'of_id'])
     df = df.set_index('id')
     if not with_modifications:
         df = df[df.of_id == -1]
@@ -54,3 +55,16 @@ def read_sexism(with_modifications=False):
 
 if __name__ == '__main__':
     print(read_sexism(with_modifications=False).head())
+
+
+def read_perspective_key():
+    config = read_config()
+    PERSPECTIVE_API_PATH = os.path.join(config['DATA_ROOT'], config['PERSPECTIVE_API_REL'])
+    with open(PERSPECTIVE_API_PATH) as f:
+        key = f.read().strip()
+    return key
+
+
+def build_feature_path(dataset_key, feature_name):
+    config = read_config()
+    return os.path.join(config['DATA_ROOT'], config[dataset_key], feature_name)

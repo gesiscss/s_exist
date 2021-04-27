@@ -4,6 +4,29 @@ import string
 from bs4 import BeautifulSoup
 from functools import partial
 
+import spacy
+
+__parser = None
+spacy_stopwords = None  # depends on the parser, should `load_spacy` before use
+
+
+def load_spacy(model_name='en_core_web_lg'):
+    global __parser
+    global spacy_stopwords
+    if __parser is None:
+        __parser = spacy.load(model_name)
+        spacy_stopwords = __parser.Defaults.stop_words
+        spacy_stopwords.update(set(string.punctuation))
+        # import en_core_web_lg
+        # parser = en_core_web_lg.load()
+
+
+def get_parser():
+    global __parser
+    load_spacy()
+    return __parser
+
+
 emoji_pattern = re.compile("["
                            u"\U0001F600-\U0001F64F"  # emoticons
                            u"\U0001F300-\U0001F5FF"  # symbols & pictographs
@@ -14,6 +37,8 @@ url_pattern = re.compile(r'(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@
 mention_pattern = re.compile(r'(^|\W)(?P<mention>(rt|ht|cc|[.] ?)?(@\w+|MENTION\d+))(\b|[' + string.punctuation + '])',
                              flags=re.I | re.M | re.DOTALL)
 hashtag_pattern = re.compile(r'(^|\W)(?P<hashtag>#\w+)(\b|[' + string.punctuation + '])', flags=re.I | re.M | re.DOTALL)
+
+escape_punct_re = re.compile('[%s]' % re.escape(string.punctuation))
 
 
 def replace_pattern(text, substitution, pattern, pattern_name):
@@ -29,7 +54,7 @@ def replace_pattern(text, substitution, pattern, pattern_name):
     return new_text
 
 
-def detweet(text): # TODO: might want to segment hashtags and mentions, or extract separate features
+def detweet(text):  # TODO: might want to segment hashtags and mentions, or extract separate features
     text = re.sub(emoji_pattern, '', text)
     text = replace_pattern(text, '', hashtag_pattern, 'hashtag')
     text = replace_pattern(text, '', mention_pattern, 'mention')
@@ -76,10 +101,45 @@ def preprocess_light(tweets, fix_encoding=False):
     return map(partial(_preprocess_light, fix_encoding=fix_encoding), tweets)
 
 
-if __name__ == '__main__':
-    from utils import read_train
+def escape_punct(x):
+    return escape_punct_re.sub(' ', x)
 
-    train = read_train()
+
+def preprocess_for_embedding(text, model_name='en_core_web_lg'):
+    load_spacy(model_name=model_name)
+
+    text = preprocess(text, fix_encoding=True).lower()
+
+    text = ' '.join(doc2token(text, remove_pron=False))
+    return text
+
+
+def doc2token(txt, remove_punct=True, remove_digit=True, remove_stops=True, remove_pron=True, lemmatize=True):
+    parser = get_parser()
+    parsed = parser(txt)
+    tokens = list()
+    for token in parsed:
+        if remove_punct and token.is_punct:
+            continue
+        if remove_digit and token.is_digit:  # skip digits
+            continue
+        if remove_stops and (token.lemma_ in spacy_stopwords):  # skip stopwords
+            continue
+        if remove_pron and (token.lemma_ == '-PRON-'):  # skip pronouns
+            continue
+        else:
+            token = token.lemma_.lower() if lemmatize else token.orth_.lower()
+            if remove_punct:
+                token = escape_punct(token)
+
+            tokens.append(token.strip())
+    return tokens
+
+
+if __name__ == '__main__':
+    from utils import read_sexism
+
+    train = read_sexism()
     for text in train.tail(100).text:
         print(text)
         print(preprocess(text, fix_encoding=True))

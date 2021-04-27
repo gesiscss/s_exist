@@ -4,7 +4,7 @@ import numpy as np
 from googleapiclient import discovery
 import time
 
-from utils import read_config
+from utils import read_config, read_perspective_key
 
 REQUESTED_ATTRIBUTES_ALL = {"TOXICITY": {}, "SEVERE_TOXICITY": {}, "IDENTITY_ATTACK": {}, "INSULT": {}, "PROFANITY": {},
                             "SEXUALLY_EXPLICIT": {}, "THREAT": {}, "FLIRTATION": {}, "ATTACK_ON_AUTHOR": {},
@@ -73,17 +73,13 @@ def get_toxicity_scores(comments, API_KEY, max_retries=3, requested_attributes=R
                     retries += 1
                     time.sleep(60)
         scores.append(score)
-        time.sleep(1)
+        time.sleep(.1)
     return scores
 
 
 if __name__ == '__main__':
-    config = read_config()
-    PERSPECTIVE_API_PATH = os.path.join(config['DATA_ROOT'], config['PERSPECTIVE_API_REL'])
-
-    with open(PERSPECTIVE_API_PATH) as f:
-        key = f.read().strip()
+    key = read_perspective_key()
     comments = [u'you ugly duck', u'the sun shines today', u'steven wilson is the god of prog']
-    print( list(zip(comments, map(parse_summary_scores,
-                                      get_toxicity_scores(comments, key,
-                                                          requested_attributes=REQUESTED_ATTRIBUTES_ALL)))))
+    print(list(zip(comments, map(parse_summary_scores,
+                                 get_toxicity_scores(comments, key,
+                                                     requested_attributes=REQUESTED_ATTRIBUTES_ALL)))))
