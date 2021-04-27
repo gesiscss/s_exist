@@ -11,10 +11,7 @@ emoji_pattern = re.compile("["
                            u"\U0001F680-\U0001F6FF"  # transport & map symbols
                            u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
                            "]+", flags=re.UNICODE | re.I | re.M | re.DOTALL)
-url_pattern = re.compile(
-    '''((https?:\/\/)?(?:www\.|(?!www))[a-zA-Z0-9]([a-zA-Z0-9-]+[a-zA-Z0-9])?\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})''',
-    flags=re.UNICODE)
-
+url_pattern = re.compile('(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?')
 mention_pattern = re.compile(r'(^|\W)(?P<mention>(rt|ht|cc|[.] ?)?(@\w+|MENTION\d+))(\b|[' + string.punctuation + '])',
                              flags=re.I | re.M | re.DOTALL)
 hashtag_pattern = re.compile(r'(^|\W)(?P<hashtag>#\w+)(\b|[' + string.punctuation + '])', flags=re.I | re.M | re.DOTALL)
@@ -87,7 +84,7 @@ if __name__ == '__main__':
     from utils import read_train
 
     train = read_train()
-    for text in train.head(100).text:
+    for text in train.tail(100).text:
         print(text)
         print(preprocess(text, fix_encoding=True))
         print("*" * 30)
