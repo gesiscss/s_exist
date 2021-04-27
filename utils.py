@@ -61,12 +61,12 @@ if __name__ == '__main__':
 
 def read_perspective_key():
     config = read_config()
-    PERSPECTIVE_API_PATH = os.path.join(config['DATA_ROOT'], config['PERSPECTIVE_API_REL'])
-    with open(PERSPECTIVE_API_PATH) as f:
+    perspective_api_path = os.path.join(config['DATA_ROOT'], config['PERSPECTIVE_API_REL'])
+    with open(perspective_api_path) as f:
         key = f.read().strip()
     return key
 
 
 def build_feature_path(dataset_key, feature_name):
     config = read_config()
-    return os.path.join(config['DATA_ROOT'], config[dataset_key]+'.'+ feature_name)
+    return os.path.join(config['DATA_ROOT'], config[dataset_key] + '.' + feature_name)
