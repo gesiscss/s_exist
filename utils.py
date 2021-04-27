@@ -41,3 +41,16 @@ def __read_data(rel_path_key, usecols=None, sep='\t'):
     df = pd.read_csv(os.path.join(config['DATA_ROOT'], config[rel_path_key]), sep=sep,
                      usecols=usecols)
     return df
+
+
+def read_sexism(with_modifications=False):
+    df = __read_data('SEXISM_REL', sep=',',
+                     usecols=['id', 'dataset', 'text', 'toxicity', 'sexist', 'scale', 'of_id'])
+    df = df.set_index('id')
+    if not with_modifications:
+        df = df[df.of_id == -1]
+    return df
+
+
+if __name__ == '__main__':
+    print(read_sexism(with_modifications=False).head())
