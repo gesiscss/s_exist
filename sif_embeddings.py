@@ -162,8 +162,8 @@ if __name__ == "__main__":
     RNG.seed(42)
 
     print('reading data')
-    train = read_train(languages=['en'])
-    test = read_test(languages=['en'])
+    train = read_train()
+    test = read_test()
     df = pd.concat((train, test))
 
     print('preprocessing')

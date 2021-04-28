@@ -289,8 +289,8 @@ if __name__ == '__main__':
     Token.set_extension("cluster", default=None)
 
     print('read input')
-    train = read_train(languages=['en'])
-    test = read_test(languages=['en'])
+    train = read_train()
+    test = read_test()
     df = pd.concat((train, test))
     # df = read_sexism()
     print('preprocess')

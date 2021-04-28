@@ -4,6 +4,8 @@ import numpy as np
 from googleapiclient import discovery
 import time
 
+from tqdm import tqdm
+
 from utils import read_config, read_perspective_key
 
 REQUESTED_ATTRIBUTES_ALL = {"TOXICITY": {}, "SEVERE_TOXICITY": {}, "IDENTITY_ATTACK": {}, "INSULT": {}, "PROFANITY": {},
@@ -56,7 +58,7 @@ def get_toxicity_scores(comments, API_KEY, max_retries=3, requested_attributes=R
                               )
 
     scores = list()
-    for comment in comments:
+    for comment in tqdm(comments):
         retries = 0
         done = False
         score = np.nan

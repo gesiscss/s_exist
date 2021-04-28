@@ -11,15 +11,33 @@ def read_config():
 
 def read_train(languages=['es', 'en']):
     df = __read_data('TRAINING_REL', sep='\t',
-                     usecols=['id', 'source', 'language', 'text', 'task1', 'task2'])
+                     usecols=['id', 'source', 'language', 'task1', 'task2', 'translated_text', 'text'])
     df = df[df.language.isin(languages)]
+    df = df.rename(columns={'translated_text': 'text', 'text': 'original_text'})
     return df.set_index('id')
 
 
 def read_test(languages=['es', 'en']):
     df = __read_data('TEST_REL', sep='\t',
-                     usecols=['id', 'source', 'language', 'text'])
+                     usecols=['id', 'source', 'language', 'translated_text', 'text'])
     df = df[df.language.isin(languages)]
+    df = df.rename(columns={'translated_text': 'text', 'text': 'original_text'})
+    return df.set_index('id')
+
+
+def read_validation(languages=['es', 'en']):
+    df = __read_data('VALIDATION_REL', sep='\t',
+                     usecols=['id', 'source', 'language', 'task1', 'task2', 'translated_text', 'text'])
+    df = df[df.language.isin(languages)]
+    df = df.rename(columns={'translated_text': 'text', 'text': 'original_text'})
+    return df.set_index('id')
+
+
+def read_train_no_validation(languages=['es', 'en']):
+    df = __read_data('TRAINING_MINUS_VALIDATION_REL', sep='\t',
+                     usecols=['id', 'source', 'language', 'task1', 'task2', 'translated_text', 'text'])
+    df = df[df.language.isin(languages)]
+    df = df.rename(columns={'translated_text': 'text', 'text': 'original_text'})
     return df.set_index('id')
 
 

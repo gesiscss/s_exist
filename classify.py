@@ -1,3 +1,5 @@
+from functools import partial
+
 import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
@@ -11,6 +13,7 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 
+from preprocessing import preprocess
 from utils import read_train, build_feature_path
 
 if __name__ == '__main__':
@@ -30,18 +33,21 @@ if __name__ == '__main__':
     print('encode platform')
     platform_le = LabelEncoder()
     train['source'] = platform_le.fit_transform(train.source)
+    # print('preprocess text')
+    # train['text'] = train.text.apply(partial(preprocess, fix_encoding=True))
     features += ['source', 'language', 'text']
 
     X = train[[column for column in train.columns if any(column.startswith(feature) for feature in features)]]
-    y = train.task1.values
+    y = train.task2.values
     y_le = LabelEncoder()
     y = y_le.fit_transform(y)
 
     print('X.shape', X.shape, 'y.shape', y.shape, 'unique y', np.unique(y))
     labels = y_le.classes_
     ss = StandardScaler()
-    fs = SelectFromModel(estimator=ElasticNet(), max_features=800)
-    clf = Pipeline(steps=[('cv', ColumnTransformer(transformers=[('cv', CountVectorizer(analyzer='char',
+    fs = SelectFromModel(estimator=ElasticNet(), max_features=800) #use multitask in case of task2
+    clf = Pipeline(steps=[
+        ('cv', ColumnTransformer(transformers=[('cv', CountVectorizer(analyzer='char',
                                                                                         ngram_range=(3, 4)), 'text')],
                                                    remainder='passthrough')),
                           # ('ss', ss),

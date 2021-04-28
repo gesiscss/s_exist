@@ -1,11 +1,13 @@
 {
   "DATA_ROOT": "",
-  "TRAINING_REL": "",
-  "TEST_REL": "",
-  "MODEL_ROOT": "",
-  "GENDERED_VOCAB_REL": "",
-  "MALE_VOCAB_REL": "",
-  "FEMALE_VOCAB_REL": "",
-  "SEXISM_REL": "",
-  "PERSPECTIVE_API_REL": ""
+  "TRAINING_REL": "training/EXIST2021_translated_training.tsv",
+  "TEST_REL": "test/EXIST2021_translated_test.tsv",
+  "VALIDATION_REL": "test/EXIST2021_translated_new_dev.tsv",
+  "TRAINING_MINUS_VALIDATION_REL": "test/EXIST2021_translated_new_train.tsv",
+  "MODEL_ROOT": "./models/",
+  "GENDERED_VOCAB_REL": "gendered_vocabulary/gender_words.txt",
+  "MALE_VOCAB_REL": "gendered_vocabulary/male_word_file.txt",
+  "FEMALE_VOCAB_REL": "gendered_vocabulary/female_word_file.txt",
+  "PERSPECTIVE_API_REL": "perspective.csv",
+  "SEXISM_REL": "sexism/sexism_exist.csv"
 }
