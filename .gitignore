@@ -136,3 +136,5 @@ models/
 # config
 config.json
 .idea/.gitignore
+/cache_dir/
+/runs/

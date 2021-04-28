@@ -313,7 +313,7 @@ if __name__ == '__main__':
     # print(len(cluster_map), 'clusters total')
     pos_blacklist = ['NUM', "PUNCT", "SPACE", "SYM"],
     filter_stopwords = True
-    cluster_words = True
+    cluster_words = False
 
     if cluster_words:
         print('cluster')
@@ -400,10 +400,10 @@ if __name__ == '__main__':
     print(M, N)
 
     senpai_df = pd.DataFrame(bag_of_dep_ngrams.todense(), index=doc_index)
-    senpai_training_rel_path = build_feature_path('TRAINING_REL', 'senpai')
+    senpai_training_rel_path = build_feature_path('TRAINING_REL', 'senpai_unclustered')
     senpai_df.loc[train.index].to_csv(senpai_training_rel_path)
 
-    senpai_test_rel_path = build_feature_path('TEST_REL', 'senpai')
+    senpai_test_rel_path = build_feature_path('TEST_REL', 'senpai_unclustered')
     senpai_df.loc[test.index].to_csv(senpai_test_rel_path)
 
 

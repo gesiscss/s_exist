@@ -19,7 +19,7 @@ from utils import read_train, build_feature_path
 if __name__ == '__main__':
 
     print('read training data')
-    train = read_train(languages=['en'])
+    train = read_train()
     features = ['sif', 'senpai_unclustered', 'senpai']
     for feature in features:
         print('read precomputed feature', feature)
