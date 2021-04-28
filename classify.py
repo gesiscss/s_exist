@@ -38,7 +38,7 @@ if __name__ == '__main__':
     features += ['source', 'language', 'text']
 
     X = train[[column for column in train.columns if any(column.startswith(feature) for feature in features)]]
-    y = train.task2.values
+    y = train.task1.values
     y_le = LabelEncoder()
     y = y_le.fit_transform(y)
 
