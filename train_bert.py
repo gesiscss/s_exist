@@ -27,9 +27,8 @@ def train(data):
 
 if __name__ == "__main__":
 	from utils import read_train, read_test
-	data = read_train(translated = True)
+	data = read_train()
 	print(data.head())
-	data['text'] = data['translated_text']
 	data['labels'] = data['task1']
 	data['labels'] = data['labels'].map({'sexist' : 1, 'non-sexist' : 0})
 	model = train(data[['text', 'labels']])

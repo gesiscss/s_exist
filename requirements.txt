@@ -7,3 +7,6 @@ pandas~=1.2.4
 spacy~=3.0.6
 beautifulsoup4~=4.9.3
 MiniSom~=2.2.9
+deep_translator==1.4.2
+simpletransformers
+transformers
