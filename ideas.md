@@ -1,14 +1,13 @@
-Lexica:
+Lexicons:
 - LIWC
-- VADER
 - NRC
 - NRC-VAD
 - Connotation Frames
 
-
 Other features:
-- most similar scale items
 - subjectivity
+- difference in toxicity when gender word masked/substituted with generic/substituted with other gender
+- supersenses of adjectives
 
 Model Training:
 - Contrastive Pretraining
