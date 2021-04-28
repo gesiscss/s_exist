@@ -55,6 +55,13 @@ def read_gendered():
     df = __read_data('GENDERED_VOCAB_REL')
     return df.values.ravel().tolist()
 
+def read_hedges():
+    df = __read_data('HEDGES_REL')
+    return df.values.ravel().tolist()    
+
+def read_boosters():
+    df = __read_data('BOOSTERS_REL')
+    return df.values.ravel().tolist()
 
 def __read_data(rel_path_key, usecols=None, sep='\t'):
     config = read_config()
