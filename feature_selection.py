@@ -41,15 +41,23 @@ class VaderSelector(AbstractTransformer):
         return ['compound', 'neu']
 
 
+class OneColumnOneHotEncoder(OneHotEncoder):
+    def fit(self, X, y=None, **params):
+        return super(OneColumnOneHotEncoder, self).fit(X.values.reshape(-1, 1), y, **params)
+
+    def transform(self, X, **params):
+        return super(OneColumnOneHotEncoder, self).transform(X.values.reshape(-1, 1), **params)
+
+
 class MostSimilarScaleSelector(AbstractTransformer):
     @property
     def columns(self):
         return self.transformer.get_feature_names()
 
     def __init__(self):
-        scale_transformer = OneHotEncoder(drop='first', handle_unknown='ignore')
-        sexist_content_transformer = OneHotEncoder(drop='first', handle_unknown='ignore')
-        sexist_transformer = OneHotEncoder(drop='if_binary', handle_unknown='ignore')
+        scale_transformer = OneColumnOneHotEncoder(drop='first', handle_unknown='error')
+        sexist_content_transformer = OneColumnOneHotEncoder(drop='first', handle_unknown='error')
+        sexist_transformer = OneColumnOneHotEncoder(drop='if_binary', handle_unknown='error')
         self.transformer = ColumnTransformer(transformers=[('sexist', sexist_transformer, 'sexist'),
                                                            ('sexist_content', sexist_content_transformer,
                                                             'sexist_content'),
@@ -80,7 +88,7 @@ class PerspectiveSelector(AbstractSupportTransformer):
 
 class GenderWordsSelector(AbstractSupportTransformer):
     def __init__(self):
-        self.transformer = SelectFromModel(LinearSVC(penalty="l1"))
+        self.transformer = SelectFromModel(LinearSVC(penalty="l1", dual=False))
 
 
 class SparseSelector(AbstractSupportTransformer):
@@ -95,16 +103,20 @@ if __name__ == '__main__':
     test = read_test()
 
     for feature, transformer in [('vader', VaderSelector()),
-                                 # ('perspective', PerspectiveSelector()),
-                                 # ('senpai', SparseSelector()),
-                                 # ('senpai_unclustered', SparseSelector()),
-                                 # ('most_similar_scale', MostSimilarScaleSelector()),
-                                 # ('male_words', GenderWordsSelector()),
-                                 # ('female_words', GenderWordsSelector()),
-                                 ]:
+        ('perspective', PerspectiveSelector()),
+        ('senpai', SparseSelector()),
+        ('senpai_unclustered', SparseSelector()),
+        ('most_similar_scale', SparseSelector()),
+        ('male_words', GenderWordsSelector()),
+        ('female_words', GenderWordsSelector()),
+    ]:
         print('processing', feature)
         in_path = build_feature_path('TRAINING_REL', feature)
         feature_df = pd.read_csv(in_path, index_col='id')
+        if feature == 'most_similar_scale':
+            trans = MostSimilarScaleSelector()
+            transformed = trans.fit_transform(feature_df).todense()
+            feature_df = pd.DataFrame(transformed, columns=trans.columns, index=feature_df.index)
         X = feature_df.loc[train_no_validation.index]
         y = train_no_validation.task1
         y_encoder = LabelEncoder()
@@ -143,11 +155,14 @@ if __name__ == '__main__':
 
         # store
         transformed_df = feature_df.loc[train.index, selected]
-        out_path = build_feature_path('TRAINING_REL', feature+'_selected')
+        out_path = build_feature_path('TRAINING_REL', feature + '_selected')
         transformed_df.to_csv(out_path)
 
         in_path = build_feature_path('TEST_REL', feature)
         feature_df = pd.read_csv(in_path, index_col='id')
+        if feature == 'most_similar_scale':
+            transformed = trans.transform(feature_df).todense()
+            feature_df = pd.DataFrame(transformed, columns=trans.columns, index=feature_df.index)
         transformed_df = feature_df.loc[test.index, selected]
-        out_path = build_feature_path('TEST_REL', feature+'_selected')
+        out_path = build_feature_path('TEST_REL', feature + '_selected')
         transformed_df.to_csv(out_path)
