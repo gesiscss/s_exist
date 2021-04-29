@@ -6,6 +6,8 @@ from utils import read_hedges, read_boosters, read_train, read_test, build_featu
 
 if __name__ == '__main__':
     hedges_lexicon = read_hedges()
+    hedges_lexicon = [i for i in hedges_lexicon if i[0] != '#']
+    print(hedges_lexicon)
     boosters_lexicon = read_boosters()
     hedges_cv = CountVectorizer(vocabulary=list(set(hedges_lexicon)))
     boosters_cv = CountVectorizer(vocabulary=list(set(boosters_lexicon)))
