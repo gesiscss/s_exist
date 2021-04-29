@@ -13,6 +13,7 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 
+from feature_selection import VIFSelector
 from preprocessing import preprocess
 from utils import read_train, build_feature_path
 
@@ -40,12 +41,12 @@ if __name__ == '__main__':
     print('encode language')
     language_le = LabelEncoder()
     train['language'] = language_le.fit_transform(train.language)
-    print('encode platform')
-    platform_le = LabelEncoder()
-    train['source'] = platform_le.fit_transform(train.source)
+    # print('encode platform')
+    # platform_le = LabelEncoder()
+    # train['source'] = platform_le.fit_transform(train.source)
     # print('preprocess text')
     # train['text'] = train.text.apply(partial(preprocess, fix_encoding=True))
-    features += ['source', 'language', 'text']
+    features += ['language', ]
 
     X = train[[column for column in train.columns if any(column.startswith(feature) for feature in features)]]
     y = train.task1.values
@@ -55,14 +56,16 @@ if __name__ == '__main__':
     print('X.shape', X.shape, 'y.shape', y.shape, 'unique y', np.unique(y))
     labels = y_le.classes_
     ss = StandardScaler()
-    fs = SelectFromModel(estimator=ElasticNetCV())  # use multitask in case of task2
+    # fs = SelectFromModel(estimator=ElasticNetCV())  # use multitask in case of task2
+    fs = VIFSelector(4)
     clf = Pipeline(steps=[
-        ('cv', ColumnTransformer(transformers=[('cv', CountVectorizer(analyzer='char',
-                                                                      max_df=.5,
-                                                                      min_df=.1,
-                                                                      max_features=1000,
-                                                                      ngram_range=(3, 4)), 'text')],
-                                 remainder='passthrough')),
+        # ('cv', ColumnTransformer(transformers=[('cv', CountVectorizer(analyzer='char',
+        #                                                               max_df=.5,
+        #                                                               min_df=.1,
+        #                                                               max_features=1000,
+        #                                                               ngram_range=(3, 4)), 'text')],
+        #                          remainder=fs
+        #                          )),
         #                   ('ss', ss),
         ('fs', fs),
         ('clf', RandomForestClassifier())])

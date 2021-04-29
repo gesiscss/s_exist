@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 import pandas as pd
-from sklearn.base import TransformerMixin
+from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import ExtraTreesClassifier, RandomForestClassifier
 from sklearn.feature_selection import RFECV, SelectFromModel
@@ -13,8 +13,11 @@ from sklearn.svm import LinearSVC
 
 from utils import read_train, read_train_no_validation, read_validation, build_feature_path, read_test
 
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+from statsmodels.tools.tools import add_constant
 
-class AbstractTransformer(ABC, TransformerMixin):
+
+class AbstractTransformer(ABC, TransformerMixin, BaseEstimator):
     @abstractmethod
     def __init__(self):
         raise NotImplemented('should implement an init setting the transformer attribute')
@@ -94,6 +97,41 @@ class GenderWordsSelector(AbstractSupportTransformer):
 class SparseSelector(AbstractSupportTransformer):
     def __init__(self):
         self.transformer = SelectFromModel(ExtraTreesClassifier(n_estimators=5))
+
+
+class VIFSelector(TransformerMixin, BaseEstimator):
+    def __init__(self, threshold):
+        self.threshold = threshold
+
+    @property
+    def columns(self):
+        return self._columns
+
+    @columns.setter
+    def columns(self, value):
+        self._columns = value
+
+    def fit(self, X, y=None, **fit_params):
+        column_list = [i for i in X.columns]
+
+        for _ in range(len(column_list)):
+
+            X_ = add_constant(X.loc[:, column_list].dropna())
+            inflations = np.array([variance_inflation_factor(X_.values, i)
+                                   for i in range(X_.shape[1])])
+            max_inflation, max_inflation_index = np.max(inflations), np.argmax(inflations)
+
+            if max_inflation > self.threshold:
+                print('dropping', column_list[max_inflation_index], "with vif", max_inflation)
+                del column_list[max_inflation_index]
+            else:
+                print('done')
+                break
+        self.columns = column_list
+        return self
+
+    def transform(self, X, **params):
+        return X.loc[:, self.columns]
 
 
 if __name__ == '__main__':
