@@ -102,13 +102,17 @@ if __name__ == '__main__':
     validation = read_validation()
     test = read_test()
 
-    for feature, transformer in [('vader', VaderSelector()),
+    for feature, transformer in [
+        ('vader', VaderSelector()),
         ('perspective', PerspectiveSelector()),
         ('senpai', SparseSelector()),
         ('senpai_unclustered', SparseSelector()),
         ('most_similar_scale', SparseSelector()),
         ('male_words', GenderWordsSelector()),
         ('female_words', GenderWordsSelector()),
+        ('hedges', SparseSelector()),
+        ('boosters', SparseSelector()),
+
     ]:
         print('processing', feature)
         in_path = build_feature_path('TRAINING_REL', feature)
