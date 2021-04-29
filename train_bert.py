@@ -26,10 +26,27 @@ def train(data):
 
 
 if __name__ == "__main__":
-	from utils import read_train, read_test
-	data = read_train()
+	
+	# train roberta models on the following:
+	# - shared task training data
+	# - share task training data minus validation data
+	# - icwsm original data
+	# - icwsm original + counterfactual data
+
+	from utils import read_train, read_test, read_sexism
+
+	# data = read_train()
+	# print(data.head())
+	# data['labels'] = data['task1']
+	# data['labels'] = data['labels'].map({'sexist' : 1, 'non-sexist' : 0})
+	# model = train(data[['text', 'labels']])
+
+	data = read_sexism()
 	print(data.head())
-	data['labels'] = data['task1']
-	data['labels'] = data['labels'].map({'sexist' : 1, 'non-sexist' : 0})
-	model = train(data[['text', 'labels']])
+	data['labels'] = data['sexist']
+	data['labels'] = data['labels'].map({True : 1, False : 0})
+#	model = train(data[['text', 'labels']])
+
+
+
 
