@@ -22,7 +22,7 @@ A sample configuration file is available as `config_sample.json`. You will need 
 
 Translate Spanish data into English with: 
 ```shell
-
+translate spanish data.ipynb
 ```
 
 Then, run the feature extraction scripts:
@@ -33,9 +33,12 @@ python most_similar_scale.py
 python feature_extraction_perspective.py
 python vader.py
 python gender_words.py
+python lexica.py
+python mentions_and_hashtags.py
 ```
 Split the data in training and validation:
 ```shell
+explore and split data.ipynb
 ```
 Then feature selection:
 ```shell

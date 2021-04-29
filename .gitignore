@@ -138,3 +138,6 @@ config.json
 .idea/.gitignore
 /cache_dir/
 /runs/
+
+# output
+/outputs/
