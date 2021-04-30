@@ -1,3 +1,4 @@
+import os
 from itertools import chain, combinations
 
 import pandas as pd
@@ -6,7 +7,7 @@ from sklearn.metrics import f1_score
 from sklearn.model_selection import cross_val_predict
 from sklearn.preprocessing import LabelEncoder
 
-from utils import read_train_no_validation, read_validation, build_feature_path, read_train
+from utils import read_train_no_validation, read_validation, build_feature_path, read_train, read_config
 
 ALL_FEATURE_NAMES = ['sif',
                      'senpai_unclustered_selected',
@@ -81,10 +82,14 @@ def find_feature_set_combination():
     for best_feature_combo, best_performance in sorted(feature_combo_performances_cross.items(),
                                                        key=lambda x: x[1], reverse=True)[:10]:
         print(best_feature_combo, best_performance)
-
-    pd.DataFrame(dict(validation=feature_combo_performances_val,
-                      crossvalidation=feature_combo_performances_cross)
-                 ).sort_values(ascending=False).to_csv('feature_set_performance.csv')
+    performance_df = pd.DataFrame(
+        {key: {'validation': feature_combo_performances_val[key],
+               'crossvalidation': feature_combo_performances_cross[key],
+               }
+         for key in feature_combo_performances_val}).T
+    save_path = os.path.join(read_config()['DATA_ROOT'], 'feature_set_performance.csv')
+    print('saving results to', save_path)
+    performance_df.sort_values(by=['validation', ], ascending=False).to_csv(save_path)
 
 
 def find_model():
