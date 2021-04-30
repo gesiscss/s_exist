@@ -8,11 +8,11 @@ transformers_logger = logging.getLogger("transformers")
 transformers_logger.setLevel(logging.WARNING)
 
 
-def train(data):
+def train(data, eval_df = None, savepath = "outputs/"):
 	# reference: https://github.com/ThilinaRajapakse/simpletransformers#a-quick-example
 
 	# Optional model configuration
-	model_args = ClassificationArgs(num_train_epochs=1)
+	model_args = ClassificationArgs(num_train_epochs=1, output_dir = savapath)
 
 	# Create a ClassificationModel
 	model = ClassificationModel(
@@ -21,6 +21,14 @@ def train(data):
 
 	# Train the model
 	model.train_model(data)
+
+	# Evaluate the model
+	if eval_df:
+		result, model_outputs, wrong_predictions = model.eval_model(eval_df)
+		print(result)
+
+	# Make predictions with the model
+	# predictions, raw_outputs = model.predict(["Sam was a Wizard"])
 
 	return model
 
@@ -33,20 +41,24 @@ if __name__ == "__main__":
 	# - icwsm original data
 	# - icwsm original + counterfactual data
 
-	from utils import read_train, read_test, read_sexism
+	train_types = ["train_no_validation",
+				   "sexism",
+				   "train"
+				   ]
 
-	# data = read_train()
-	# print(data.head())
-	# data['labels'] = data['task1']
-	# data['labels'] = data['labels'].map({'sexist' : 1, 'non-sexist' : 0})
-	# model = train(data[['text', 'labels']])
+	from utils import read_train, read_test, read_sexism, read_train_no_validation, read_validation
 
-	data = read_sexism()
+	test = read_validation()
 	print(data.head())
 	data['labels'] = data['sexist']
 	data['labels'] = data['labels'].map({True : 1, False : 0})
-#	model = train(data[['text', 'labels']])
 
+	for train_type in train_types:
+		if train_type == 'train_no_validation':
+			data = read_train_no_validation()
+			print(data.head())
+			data['labels'] = data['sexist']
+			data['labels'] = data['labels'].map({True : 1, False : 0})
 
-
-
+	
+		model = train(data, test, savepath = "outputs/%s" train_type)
