@@ -2,27 +2,27 @@ from simpletransformers.classification import ClassificationModel, Classificatio
 import pandas as pd
 import logging
 
+from sklearn.metrics import classification_report
+
 
 logging.basicConfig(level=logging.INFO)
 transformers_logger = logging.getLogger("transformers")
 transformers_logger.setLevel(logging.WARNING)
 
 
-def train(data, savepath = "outputs/"):
+def predict(eval_df, loadpath = "outputs/"):
 	# reference: https://github.com/ThilinaRajapakse/simpletransformers#a-quick-example
 
-	# Optional model configuration
-	model_args = ClassificationArgs(num_train_epochs=5, output_dir = savepath)
-
-	# Create a ClassificationModel
+	# load model
 	model = ClassificationModel(
-    	"roberta", "roberta-base", args=model_args, use_cuda = False
-	)
+    "roberta", loadpath, use_cuda = False
+)
 
-	# Train the model
-	model.train_model(data)
+	# Make predictions with the model
+	predictions, raw_outputs = model.predict(list(eval_df['text'].values))
 
-	return model
+	print(classification_report(list(eval_df['labels'].values), predictions))
+
 
 
 if __name__ == "__main__":
@@ -50,12 +50,19 @@ if __name__ == "__main__":
 
 	from utils import read_train, read_test, read_sexism, read_train_no_validation, read_validation
 
-	for train_type in train_types:
-		if train_type == 'train_no_validation':
-			data = read_train_no_validation()
-		
-		print(data.head())
-		data['labels'] = data[label_field[train_type]]
-		data['labels'] = data['labels'].map(labels[train_type])
+	test = read_validation()
+	print(test.head())
+	test['labels'] = test[label_field['train_no_validation']]
+	test['labels'] = test['labels'].map(labels['train_no_validation'])
+
+	predict(test, loadpath = 'outputs/train_no_validation')
 	
-		model = train(data, savepath = "outputs/%s" %train_type)
+	# for train_type in train_types:
+	# 	if train_type == 'train_no_validation':
+	# 		data = read_train_no_validation()
+		
+	# 	print(data.head())
+	# 	data['labels'] = data[label_field[train_type]]
+	# 	data['labels'] = data['labels'].map(labels[train_type])
+	
+	# 	model = train(test, loadpath = "outputs/%s" %train_type)
