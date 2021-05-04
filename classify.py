@@ -30,7 +30,16 @@ if __name__ == '__main__':
                 'most_similar_scale_selected',
                 'perspective_selected',
                 'boosters_selected',
-                'hedges_selected'
+                'hedges_selected',
+                # 'mentions',
+                # 'hashtags',
+                # 'mentions_total',
+                # 'hashtags_total',
+                # 'mentions_count',
+                # 'hashtags_count',
+                # 'bert_binary', # Do not use yet, not fully generated
+                # 'bert_multiclass', # Do not use yet, not fully generated
+                # 'bert embeddings', # Do not use yet, not fully generated
                 ]
     for feature in features:
         print('read precomputed feature', feature)

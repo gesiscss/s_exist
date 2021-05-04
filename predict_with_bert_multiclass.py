@@ -12,10 +12,10 @@ transformers_logger = logging.getLogger("transformers")
 transformers_logger.setLevel(logging.WARNING)
 
 
-def predict(eval_df, test_name = "TEST", dataset_key = 'TEST_REL', loadpath = "outputs/",
+def predict(eval_df, test_name = "exist_test", loadpath = "outputs/",
 			 task = 'task1', run = '1', label_mapping = {1 : 'sexist', 0 : 'non-sexist'}):
 
-	from utils import generate_test_run, build_feature_path
+	from utils import generate_test_run
 
 	# testing with a random generator
 	# eval_df['predictions'] = [random.randint(0, 1) for _ in range(len(eval_df))]
@@ -24,7 +24,7 @@ def predict(eval_df, test_name = "TEST", dataset_key = 'TEST_REL', loadpath = "o
 
 	# load model
 	model = ClassificationModel(
-	"roberta", loadpath, use_cuda = False
+    "roberta", loadpath, use_cuda = False
 )
 
 	# Make predictions with the model
@@ -43,11 +43,6 @@ def predict(eval_df, test_name = "TEST", dataset_key = 'TEST_REL', loadpath = "o
 	eval_df = eval_df.reset_index()
 	eval_df['id'] = eval_df['id'].astype(str)
 	eval_df['predictions'] = eval_df['predictions'].map(label_mapping)
-
-	# save the labels as features
-	feature_store_path = build_feature_path(dataset_key, 'bert_binary')
-	df = eval_df[['id', 'predictions']]
-	df.to_csv(feature_store_path, index = False)
 
 	# save runs ONLY for test data
 	if test_name == 'exist_test':
@@ -82,14 +77,15 @@ if __name__ == "__main__":
 
 	from utils import read_validation, read_train, read_test
 
-	train = read_train()
+
 	test = read_test()
+	print(test.head())
+	predict(test, loadpath = '/bigdata/indira/s_exist/outputs/train_no_validation/',
+	 test_name = "exist_test")
 
-	for dataset, dataset_key in [(train, 'TRAINING_REL'),
-								 (test, 'TEST_REL')]:
 
-		print(dataset.head())
-		predict(dataset, loadpath = '/bigdata/indira/s_exist/outputs/train_no_validation/',
-	 	test_name = dataset_key[:-4], dataset_key = dataset_key)
-
+	test = read_train()
+	print(test.head())
+	predict(test, loadpath = '/bigdata/indira/s_exist/outputs/train_no_validation/',
+	 test_name = "exist_train")
 

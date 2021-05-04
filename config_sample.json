@@ -1,5 +1,6 @@
 {
   "DATA_ROOT": "",
+  "TEST_RUN_ROOT": "test/",
   "TRAINING_REL": "training/EXIST2021_translated_training.tsv",
   "TEST_REL": "test/EXIST2021_translated_test.tsv",
   "VALIDATION_REL": "training/EXIST2021_translated_new_dev.tsv",
