@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import ExtraTreesClassifier, RandomForestClassifier
-from sklearn.feature_selection import RFECV, SelectFromModel
+from sklearn.feature_selection import RFECV, SelectFromModel, SelectKBest, chi2
 from sklearn.metrics import classification_report
 from sklearn.model_selection import cross_val_predict
 from sklearn.preprocessing import OneHotEncoder, LabelEncoder
@@ -99,6 +99,20 @@ class SparseSelector(AbstractSupportTransformer):
         self.transformer = SelectFromModel(ExtraTreesClassifier(n_estimators=5))
 
 
+class CategoricalSelector(AbstractSupportTransformer):
+    def __init__(self, significance=.05):
+        self.significance = significance
+        self.transformer = SelectKBest(chi2, k='all')
+
+    def fit(self, X, y, **fit_params):
+        super(AbstractSupportTransformer, self).fit(X, y, **fit_params)
+        self.columns = np.array(X.columns)[self.transformer.pvalues_ < self.significance].tolist()
+        return self
+
+    def transform(self, X):
+        return X.iloc[:, np.nonzero((self.transformer.pvalues_ < self.significance))[0].tolist()]
+
+
 class VIFSelector(TransformerMixin, BaseEstimator):
     def __init__(self, threshold):
         self.threshold = threshold
@@ -143,6 +157,7 @@ if __name__ == '__main__':
     for feature, transformer in [
         ('vader', VaderSelector()),
         ('perspective', PerspectiveSelector()),
+        ('perspective_difference', PerspectiveSelector()),
         ('senpai', SparseSelector()),
         ('senpai_unclustered', SparseSelector()),
         ('most_similar_scale', SparseSelector()),
@@ -150,7 +165,8 @@ if __name__ == '__main__':
         ('female_words', GenderWordsSelector()),
         ('hedges', SparseSelector()),
         ('boosters', SparseSelector()),
-
+        ('hashtags', SparseSelector()),
+        ('mentions', CategoricalSelector(.1)),
     ]:
         print('processing', feature)
         in_path = build_feature_path('TRAINING_REL', feature)

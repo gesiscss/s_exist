@@ -32,6 +32,18 @@ def mask_gender_words(text, pattern=gender_word_re, replace_dict=defaultdict(lam
     return new_text
 
 
+def compute_difference():
+    for dataset_key in ['TRAINING_REL', 'TEST_REL']:
+        original_path = build_feature_path(dataset_key, 'perspective')
+        masked_path = build_feature_path(dataset_key, 'perspective_masked')
+        feature_store_path = build_feature_path(dataset_key, 'perspective_difference')
+        original_df = pd.read_csv(original_path, index_col='id')
+        masked_df = pd.read_csv(masked_path, index_col='id')
+        for col in original_df.columns:
+            original_df[col] -= masked_df[col]
+        original_df.to_csv(feature_store_path)
+
+
 if __name__ == '__main__':
 
     config = read_config()
@@ -47,6 +59,8 @@ if __name__ == '__main__':
     for dataset, dataset_key in [(train, 'TRAINING_REL'),
                                  (test, 'TEST_REL')]:
         print('processing', dataset_key)
-        feature_store_path = build_feature_path(dataset_key, mask_gendered and 'perspective' or 'perspective_masked')
+        feature_store_path = build_feature_path(dataset_key, mask_gendered and 'perspective_masked' or 'perspective')
         df = perspective_df(dataset, key, ['en'])
         df.to_csv(feature_store_path)
+    if mask_gendered:
+        compute_difference()
