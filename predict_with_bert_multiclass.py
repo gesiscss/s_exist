@@ -45,7 +45,7 @@ def predict(eval_df, test_name = "TEST", dataset_key = 'TEST_REL', loadpath = "o
 	eval_df['predictions'] = eval_df['predictions'].map(label_mapping)
 
 	# save the labels as features
-	feature_store_path = build_feature_path(dataset_key, 'bert_binary')
+	feature_store_path = build_feature_path(dataset_key, 'bert_multiclass')
 	df = eval_df[['id', 'predictions']]
 	df.to_csv(feature_store_path, index = False)
 
@@ -53,6 +53,10 @@ def predict(eval_df, test_name = "TEST", dataset_key = 'TEST_REL', loadpath = "o
 	if test_name == 'TEST':
 		eval_df = eval_df[['test_case', 'id', 'predictions']]
 		generate_test_run(eval_df, task = task, run = run)
+
+	# for validation, print results
+	if test_name == 'VALIDATION':
+		print(classification_report(eval_df['task2'], eval_df['predictions']))
 
 
 
@@ -84,12 +88,17 @@ if __name__ == "__main__":
 
 	train = read_train()
 	test = read_test()
+	val = read_validation()
+
+	label_mapping = dict(zip(range(0, len(train.task2.unique())),
+								sorted(train.task2.unique())))
 
 	for dataset, dataset_key in [(test, 'TEST_REL'),
-								 (train, 'TRAINING_REL')]:
+								 (train, 'TRAINING_REL'),
+								 (val, 'VALIDATION_REL')]:
 
 		print(dataset.head())
-		predict(dataset, loadpath = '/bigdata/indira/s_exist/outputs/train_no_validation/',
-	 	test_name = dataset_key[:-4], dataset_key = dataset_key)
+		predict(dataset, loadpath = '/bigdata/indira/s_exist/outputs/train_no_validation_multiclass/',
+	 	test_name = dataset_key[:-4], dataset_key = dataset_key, label_mapping = label_mapping, task = "task2")
 
 
