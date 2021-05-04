@@ -99,6 +99,7 @@ if __name__ == "__main__":
 
 		print(dataset.head())
 		predict(dataset, loadpath = '/bigdata/indira/s_exist/outputs/train_no_validation_multiclass/',
-	 	test_name = dataset_key[:-4], dataset_key = dataset_key, label_mapping = label_mapping, task = "task2")
+	 	test_name = dataset_key[:-4], dataset_key = dataset_key,
+	 	 label_mapping = label_mapping, task = "task2")
 
 
