@@ -12,7 +12,10 @@ def train(data, savepath = "outputs/"):
 	# reference: https://github.com/ThilinaRajapakse/simpletransformers#a-quick-example
 
 	# Optional model configuration
-	model_args = ClassificationArgs(num_train_epochs=5, output_dir = savepath)
+	model_args = ClassificationArgs(num_train_epochs=5, output_dir=savepath,
+									 early_stopping_consider_epochs=True,
+									 #output_hidden_states=True
+									 )
 
 	# Create a ClassificationModel
 	model = ClassificationModel(
@@ -34,7 +37,7 @@ if __name__ == "__main__":
 	# - icwsm original + counterfactual data
 
 	train_types = ["train_no_validation", 
-				   "sexism",
+				   #"sexism",
 				   "train",
 				   ]
 
@@ -44,7 +47,7 @@ if __name__ == "__main__":
 				   }
 
 	labels = {"train_no_validation" : {'sexist' : 1, 'non-sexist' : 0},
-				   "sexism" : {True : 1, False : 0},
+				   "sexist" : {True : 1, False : 0},
 				   "train" : {'sexist' : 1, 'non-sexist' : 0},
 				   }
 
@@ -58,4 +61,4 @@ if __name__ == "__main__":
 		data['labels'] = data[label_field[train_type]]
 		data['labels'] = data['labels'].map(labels[train_type])
 	
-		model = train(data, savepath = "outputs/%s" %train_type)
+		model = train(data, savepath = "outputs/%s_hidden_outputs" %train_type)

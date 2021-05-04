@@ -16,10 +16,10 @@ def read_train(languages=['es', 'en']):
     df = df.rename(columns={'translated_text': 'text', 'text': 'original_text'})
     return df.set_index('id')
 
-
+# adding test_case in the usecols since we need that field for the test runs
 def read_test(languages=['es', 'en']):
     df = __read_data('TEST_REL', sep='\t',
-                     usecols=['id', 'source', 'language', 'translated_text', 'text'])
+                     usecols=['id', 'test_case', 'source', 'language', 'translated_text', 'text'])
     df = df[df.language.isin(languages)]
     df = df.rename(columns={'translated_text': 'text', 'text': 'original_text'})
     return df.set_index('id')
@@ -95,3 +95,8 @@ def read_perspective_key():
 def build_feature_path(dataset_key, feature_name):
     config = read_config()
     return os.path.join(config['DATA_ROOT'], config[dataset_key] + '.' + feature_name)
+
+def generate_test_run(df_with_predictions, team_name = "gesiscss", task = 'task1', run = '1'):
+    config = read_config()
+    savepath = os.path.join(config['TEST_RUN_ROOT'] + task + "_" + team_name + "_" + run)
+    df_with_predictions.to_csv(savepath, sep = "\t", index = False, header = False)
