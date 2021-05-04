@@ -35,7 +35,8 @@ def find_feature_set_combination():
     feature_combo_performances_cross = dict()
 
     def powerset(iterable):
-        "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
+        """powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)
+        """
         s = list(iterable)
         return chain.from_iterable(combinations(s, r) for r in range(1, len(s) + 1))
 
@@ -46,6 +47,7 @@ def find_feature_set_combination():
         all_train = all_train_no_validation.copy()
         cols = list()
         for feature in feature_combo:
+            if not feature: continue # empty set
             # add to train
             feature_path = build_feature_path('TRAINING_REL', feature)
             feature_df = pd.read_csv(feature_path, index_col='id')
