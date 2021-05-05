@@ -101,7 +101,7 @@ if __name__ == '__main__':
 
     print('X.shape', X.shape, 'y.shape', y.shape, 'unique y', np.unique(y))
     labels = y_le.classes_
-    ss = StandardScaler()
+    ss = StandardScaler(with_mean=False)
     fs = SelectFromModel(estimator=MultinomialNB())  # use multitask in case of task2
 
     # add different types of ML models
@@ -111,13 +111,15 @@ if __name__ == '__main__':
          "SVM",
          "LR",
          "RF",
+         "SVC"
         ]
 
     classifiers = [
         #MultinomialNB(),
-        LinearSVC(class_weight="balanced"),
-        LogisticRegression(class_weight="balanced"),
-        RandomForestClassifier(class_weight="balanced"),
+        LinearSVC(),
+        LogisticRegression(),
+        RandomForestClassifier(),
+        SVC()
         #MLPClassifier()
     ]
 
@@ -125,15 +127,18 @@ if __name__ == '__main__':
               #{'clf__alpha': (1e-2, 1e-3)},
               {'clf__C': [0.01, 0.1, 1, 10, 100], 'clf__class_weight' : ['balanced', None]},
               {'clf__C': [0.01, 0.1, 1, 10, 100], 'clf__penalty': ['l1', 'l2'], 'clf__class_weight' : ['balanced', None]},
-              {'clf__max_depth': (1, 10, 50, 100, 200), 'clf__class_weight' : ['balanced', None]},
+              {'clf__max_depth': (1, 10, 50, 100, 200, 300, 400), 'clf__class_weight' : ['balanced', None]},
+              {'clf__gamma': ['scale', 'auto'], 'clf__kernel' : ['rbf', 'poly'], 'clf__class_weight' : ['balanced', None]},
         #     {'clf__alpha': (1e-2, 1e-3)}
              ]
     
     models = {}
     all_results = []
+
+    skf = StratifiedKFold(n_splits=5)
     
     for name, classifier, params in zip(names, classifiers, parameters):
-        clf = Pipeline(steps=[
+        ppl = Pipeline(steps=[
           ('cv', ColumnTransformer(transformers=[('cv', Pipeline(steps=[('cv', CountVectorizer(analyzer='char',
                                                                       max_df=.5,
                                                                       min_df=.1,
@@ -142,11 +147,11 @@ if __name__ == '__main__':
                                                                       ]), 'text')],
                                  remainder='passthrough'
                                  )),
-          #                   ('ss', ss),
-          # ('fs', fs),
+                             ('ss', ss),
+          ('fs', fs),
           ('clf', classifier)
           ])
-        gs_clf = GridSearchCV(clf, param_grid=params, n_jobs=-1, cv = 10)
+        gs_clf = GridSearchCV(ppl, param_grid=params, n_jobs=-1, cv = skf)
         #clf = gs_clf.fit(X_train, y_train)
         models[name] = gs_clf
         
@@ -155,7 +160,6 @@ if __name__ == '__main__':
 
         print(name)
   
-        skf = StratifiedKFold(n_splits=10)
         y_pred = cross_val_predict(estimator=gs_clf.best_estimator_, X=X, y=y, cv=skf)
         print(classification_report(y_true=y, y_pred=y_pred, target_names=labels))
 
