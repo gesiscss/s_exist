@@ -29,17 +29,17 @@ if __name__ == '__main__':
                 'senpai_selected',
                 'most_similar_scale_selected',
                 'perspective_selected',
-                'perspective_difference_selected',
+                # 'perspective_difference_selected', # file doesn't exist
                 'boosters_selected',
                 'hedges_selected',
                 # 'mentions_selected',
-                'hashtags_selected',
+                # 'hashtags_selected', # file doesn't exist
                 'mentions_total',
                 # 'hashtags_total',
                 # 'mentions_count',
                 # 'hashtags_count',
-                'bert_binary', 
-                'bert_multiclass',
+                # 'bert_binary', # need to encode
+                # 'bert_multiclass', # need to encode
                 'bert_avg_all_binary',
                 'bert_avg_all_multiclass', 
                 ]

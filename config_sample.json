@@ -13,5 +13,7 @@
   "SEXISM_REL": "sexism/sexism_exist.csv",
   "HEDGES_REL": "hedges_boosters/hedge_words.txt",
   "BOOSTERS_REL": "hedges_boosters/booster_words.txt",
-  "NRC_VAD_REL": "NRC-Suite-of-Sentiment-Emotion-Lexicons/NRC-Suite-of-Sentiment-Emotion-Lexicons/NRC-Sentiment-Emotion-Lexicons/NRC-VAD-Lexicon/NRC-VAD-Lexicon.txt"
+  "NRC_VAD_REL": "NRC-Suite-of-Sentiment-Emotion-Lexicons/NRC-Suite-of-Sentiment-Emotion-Lexicons/NRC-Sentiment-Emotion-Lexicons/NRC-VAD-Lexicon/NRC-VAD-Lexicon.txt",
+  "MODELPATH_REL" : "../../sexism/sexist_models/"
+
 }
