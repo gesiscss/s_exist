@@ -51,11 +51,8 @@ if __name__ == '__main__':
     print('encode language')
     language_le = LabelEncoder()
     train['language'] = language_le.fit_transform(train.language)
-    # print('encode platform')
-    # platform_le = LabelEncoder()
-    # train['source'] = platform_le.fit_transform(train.source)
-    # print('preprocess text')
-    # train['text'] = train.text.apply(partial(preprocess, fix_encoding=True))
+    print('preprocess text')
+    train['text'] = train.text.apply(partial(preprocess, fix_encoding=True))
     features += ['language', 'text']
 
     X = train[[column for column in train.columns if any(column.startswith(feature) for feature in features)]]
