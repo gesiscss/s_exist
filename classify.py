@@ -29,11 +29,12 @@ if __name__ == '__main__':
                 'senpai_selected',
                 'most_similar_scale_selected',
                 'perspective_selected',
+                'perspective_difference_selected',
                 'boosters_selected',
                 'hedges_selected',
-                # 'mentions',
-                # 'hashtags',
-                # 'mentions_total',
+                # 'mentions_selected',
+                'hashtags_selected',
+                'mentions_total',
                 # 'hashtags_total',
                 # 'mentions_count',
                 # 'hashtags_count',
@@ -55,7 +56,7 @@ if __name__ == '__main__':
     # train['source'] = platform_le.fit_transform(train.source)
     # print('preprocess text')
     # train['text'] = train.text.apply(partial(preprocess, fix_encoding=True))
-    features += ['language', ]
+    features += ['language', 'text']
 
     X = train[[column for column in train.columns if any(column.startswith(feature) for feature in features)]]
     y = train.task1.values
@@ -65,18 +66,18 @@ if __name__ == '__main__':
     print('X.shape', X.shape, 'y.shape', y.shape, 'unique y', np.unique(y))
     labels = y_le.classes_
     ss = StandardScaler()
-    # fs = SelectFromModel(estimator=ElasticNetCV())  # use multitask in case of task2
-    fs = VIFSelector(4)
+    fs = SelectFromModel(estimator=MultinomialNB())  # use multitask in case of task2
     clf = Pipeline(steps=[
-        # ('cv', ColumnTransformer(transformers=[('cv', CountVectorizer(analyzer='char',
-        #                                                               max_df=.5,
-        #                                                               min_df=.1,
-        #                                                               max_features=1000,
-        #                                                               ngram_range=(3, 4)), 'text')],
-        #                          remainder=fs
-        #                          )),
+        ('cv', ColumnTransformer(transformers=[('cv', Pipeline(steps=[('cv', CountVectorizer(analyzer='char',
+                                                                      max_df=.5,
+                                                                      min_df=.1,
+                                                                      ngram_range=(3, 4))),
+                                                                      ('fs', fs)
+                                                                      ]), 'text')],
+                                 remainder='passthrough'
+                                 )),
         #                   ('ss', ss),
-        ('fs', fs),
+        # ('fs', fs),
         ('clf', RandomForestClassifier())])
     skf = StratifiedKFold(n_splits=10)
     y_pred = cross_val_predict(estimator=clf, X=X, y=y, cv=skf)
