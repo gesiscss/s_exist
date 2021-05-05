@@ -99,4 +99,5 @@ def build_feature_path(dataset_key, feature_name):
 def generate_test_run(df_with_predictions, team_name = "gesiscss", task = 'task1', run = '1'):
     config = read_config()
     savepath = os.path.join(config['TEST_RUN_ROOT'] + task + "_" + team_name + "_" + run)
+    df_with_predictions['id'] = df_with_predictions['id'].apply(lambda x: x.zfill(6))
     df_with_predictions.to_csv(savepath, sep = "\t", index = False, header = False)

@@ -50,7 +50,7 @@ def predict(eval_df, test_name = "TEST", dataset_key = 'TEST_REL', loadpath = "o
 	df.to_csv(feature_store_path, index = False)
 
 	# save runs ONLY for test data
-	if test_name == 'exist_test':
+	if test_name == 'TEST':
 		eval_df = eval_df[['test_case', 'id', 'predictions']]
 		generate_test_run(eval_df, task = task, run = run)
 
@@ -85,8 +85,8 @@ if __name__ == "__main__":
 	train = read_train()
 	test = read_test()
 
-	for dataset, dataset_key in [(train, 'TRAINING_REL'),
-								 (test, 'TEST_REL')]:
+	for dataset, dataset_key in [(test, 'TEST_REL'),
+								 (train, 'TRAINING_REL')]:
 
 		print(dataset.head())
 		predict(dataset, loadpath = '/bigdata/indira/s_exist/outputs/train_no_validation/',
