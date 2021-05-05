@@ -29,7 +29,7 @@ if __name__ == '__main__':
     X = train['text']
     X_test = test['text']
 
-    y = train.task1.values
+    y = train.task2.values
     y_le = LabelEncoder()
     y = y_le.fit_transform(y)
 
@@ -66,5 +66,5 @@ if __name__ == '__main__':
     for dataset, dataset_key in [(y_train_df, 'TRAINING_REL'),
                                  (y_test_df, 'TEST_REL')]:
         print('saving', dataset_key)
-        feature_store_path = build_feature_path(dataset_key, 'char_prediction')
+        feature_store_path = build_feature_path(dataset_key, 'char_prediction_multi')
         dataset.to_csv(feature_store_path)

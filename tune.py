@@ -9,17 +9,23 @@ from sklearn.preprocessing import LabelEncoder
 
 from utils import read_train_no_validation, read_validation, build_feature_path, read_train, read_config
 
-ALL_FEATURE_NAMES = ['sif',
-                     'senpai_unclustered_selected',
-                     'vader_selected',
-                     'male_words_selected',
-                     'female_words_selected',
-                     'senpai_selected',
-                     'most_similar_scale_selected',
-                     'perspective_selected',
-                     'boosters_selected',
-                     'hedges_selected',
-                     ]
+ALL_FEATURE_NAMES = [
+    'bert_avg_all_but_first_binary_scaled',
+    'boosters_selected',
+    'char_prediction',
+    'hashtags_selected',
+    'hedges_selected',
+    'mentions_total',
+    'female_words_selected',
+    'male_words_selected',
+    'most_similar_scale_selected',
+    'perspective_selected',
+    'perspective_difference_selected',
+    'senpai_selected',
+    'senpai_unclustered_selected',
+    'sif',
+    'vader_selected',
+]
 
 
 def find_feature_set_combination():
@@ -34,11 +40,11 @@ def find_feature_set_combination():
     feature_combo_performances_val = dict()
     feature_combo_performances_cross = dict()
 
-    def powerset(iterable):
+    def powerset(iterable, min_n=6):
         """powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)
         """
         s = list(iterable)
-        return chain.from_iterable(combinations(s, r) for r in range(1, len(s) + 1))
+        return chain.from_iterable(combinations(s, r) for r in range(min_n, len(s) + 1)[::-1])
 
     for feature_combo in powerset(ALL_FEATURE_NAMES):
 
@@ -47,7 +53,7 @@ def find_feature_set_combination():
         all_train = all_train_no_validation.copy()
         cols = list()
         for feature in feature_combo:
-            if not feature: continue # empty set
+            if not feature: continue  # empty set
             # add to train
             feature_path = build_feature_path('TRAINING_REL', feature)
             feature_df = pd.read_csv(feature_path, index_col='id')
@@ -58,7 +64,10 @@ def find_feature_set_combination():
             validation = pd.merge(validation, feature_df, how='left', left_index=True, right_index=True)
             # add to all_train
             all_train = pd.merge(all_train, feature_df, how='left', left_index=True, right_index=True)
-
+        for col in cols:
+            if col not in train.columns:
+                print( col)
+                exit(-1)
         # test on validation
         X = train[cols]
         clf = RandomForestClassifier(n_estimators=50, max_depth=5)
@@ -107,6 +116,7 @@ def find_model():
     #     seed=5,
     # )
     # automl.fit(X_train, y_train, dataset_name='breast_cancer')
+
 
 if __name__ == '__main__':
     find_feature_set_combination()
