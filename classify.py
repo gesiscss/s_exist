@@ -38,9 +38,10 @@ if __name__ == '__main__':
                 # 'hashtags_total',
                 # 'mentions_count',
                 # 'hashtags_count',
-                # 'bert_binary', # Do not use yet, not fully generated
-                # 'bert_multiclass', # Do not use yet, not fully generated
-                # 'bert embeddings', # Do not use yet, not fully generated
+                'bert_binary', 
+                'bert_multiclass',
+                'bert_avg_all_binary',
+                'bert_avg_all_multiclass', 
                 ]
     for feature in features:
         print('read precomputed feature', feature)
