@@ -2,6 +2,7 @@ import json
 import pandas as pd
 import os
 
+from sklearn.metrics import f1_score
 
 def read_config():
     with open('config.json') as f:
@@ -96,8 +97,53 @@ def build_feature_path(dataset_key, feature_name):
     config = read_config()
     return os.path.join(config['DATA_ROOT'], config[dataset_key] + '.' + feature_name)
 
-def generate_test_run(df_with_predictions, team_name = "gesiscss", task = 'task1', run = '1'):
+def generate_test_run(df_with_predictions, team_name = "s_exist", task = 'task1', run = '1', model_type = ''):
     config = read_config()
-    savepath = os.path.join(config['TEST_RUN_ROOT'] + task + "_" + team_name + "_" + run)
+    savepath = os.path.join(config['TEST_RUN_ROOT'] + task + "_" + team_name + "_" + run + model_type)
     df_with_predictions['id'] = df_with_predictions['id'].apply(lambda x: x.zfill(6))
     df_with_predictions.to_csv(savepath, sep = "\t", index = False, header = False)
+
+
+def read_modelpath():
+    config = read_config()
+    return config['MODELPATH_REL']
+
+
+
+def get_results(cr, y_true, y_pred, 
+                 method = 'logreg',
+                 hyperparams = "",
+                 mode = False,
+                 construct = 'sentiment',
+                 labels = {1: 'sexist', 0 :'non-sexist'},
+                 dataset = 'in-domain',
+                 cf_type = 'all'):
+
+    #print(cr)
+    total = sum([cr[labels[i]]['support'] for i in labels])
+    
+    result = {}
+    result['method'] = method
+    result['hyperparameters'] = hyperparams
+    # result['dataset'] = dataset
+    # result['mode'] = mode
+    # result['construct'] = construct
+    # result['cf_type'] = cf_type
+    
+    for key, label in labels.items():
+
+        result['Fraction of %s Class' %(label)] = float(cr[label]['support'])/total
+        result['%s Class Precision' %(label)] = cr[label]['precision']
+        result['%s Class Recall' %(label)] = cr[label]['recall']
+        result['%s Class F1' %(label)] = cr[label]['f1-score']
+        result['Fraction of Predicted %s' %(label)] = len([i for i in y_pred if i == key])\
+                                            /len(y_pred)
+    
+    
+    result['Macro Average Precision'] = cr['macro avg']['precision']
+    result['Macro Average Recall'] = cr['macro avg']['recall']
+    result['Weighted F1'] = f1_score(y_true, y_pred, average = 'weighted')
+    result['Macro F1'] = cr['macro avg']['f1-score']
+    
+    
+    return result    

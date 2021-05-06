@@ -51,12 +51,17 @@ def predict(eval_df, test_name = "TEST", dataset_key = 'TEST_REL', loadpath = "o
 
 	# save runs ONLY for test data
 	if test_name == 'TEST':
+		eval_df['binary_predictions'] = ['non-sexist' if i != 'sexist' else i for i in eval_df['predictions']]
+		eval_df['binary_predictions'] = eval_df['predictions']
 		eval_df = eval_df[['test_case', 'id', 'predictions']]
-		generate_test_run(eval_df, task = task, run = run)
+		generate_test_run(eval_df, task = task, run = "3", model_type = 'binarized_multiclass_bert')
 
 	# for validation, print results
 	if test_name == 'VALIDATION':
 		print(classification_report(eval_df['task2'], eval_df['predictions']))
+		# convert to binary and see performance
+		eval_df['binary_predictions'] = ['non-sexist' if i != 'sexist' else i for i in eval_df['predictions']]
+		print(classification_report(eval_df['task1'], eval_df['binary_predictions']))
 
 
 
@@ -93,9 +98,10 @@ if __name__ == "__main__":
 	label_mapping = dict(zip(range(0, len(train.task2.unique())),
 								sorted(train.task2.unique())))
 
-	for dataset, dataset_key in [(test, 'TEST_REL'),
-								 (train, 'TRAINING_REL'),
-								 (val, 'VALIDATION_REL')]:
+	for dataset, dataset_key in [
+								 #(train, 'TRAINING_REL'),
+								 (val, 'VALIDATION_REL'),
+								 (test, 'TEST_REL'),]:
 
 		print(dataset.head())
 		predict(dataset, loadpath = '/bigdata/indira/s_exist/outputs/train_no_validation_multiclass/',
