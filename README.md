@@ -5,7 +5,10 @@ exist task at IberLEF
 ### to install
 python requirements and resources:
 ```shell
+sudo apt-get install build-essential swig python3-dev
 pip install -r requirements.txt
+curl https://raw.githubusercontent.com/automl/auto-sklearn/master/requirements.txt | xargs -n 1 -L 1 pip3 install
+pip3 install auto-sklearn
 python -m nltk.downloader punkt
 python -m nltk.downloader stopwords
 python -m nltk.downloader vader_lexicon
@@ -44,14 +47,10 @@ Then feature selection:
 ```shell
 python feature_selection.py
 ```
-Model tuning:
-```shell
-
-```
-And classification:
-```shell
-python classify.py
-```
+Model tuning and  classification:
+* finetuned_classify*.py
+* automl_task*.ipynb
+* gridsearch_task*.ipynb
 
 
 ### troubleshoot
