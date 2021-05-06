@@ -121,13 +121,13 @@ if __name__ == '__main__':
     test['id'] = test['id'].astype(str)
 
     skf = StratifiedKFold(n_splits=10)
-    # y_pred = cross_val_predict(estimator=clf, X=X, y=y, cv=skf)
-    # print(classification_report(y_true=y, y_pred=y_pred, target_names=labels))
-    # clf.fit(X, y)
-    # test['predictions'] = clf.predict(X_test)
-    # test['predictions'] = test['predictions'].map({1 : 'sexist', 0 : 'non-sexist'})
-    # test = test[['test_case', 'id', 'predictions']]
-    # generate_test_run(test, task = "task1", run = "2", model_type = "RF_untuned")
+    y_pred = cross_val_predict(estimator=clf, X=X, y=y, cv=skf)
+    print(classification_report(y_true=y, y_pred=y_pred, target_names=labels))
+    clf.fit(X, y)
+    test['predictions'] = clf.predict(X_test)
+    test['predictions'] = test['predictions'].map({1 : 'sexist', 0 : 'non-sexist'})
+    test = test[['test_case', 'id', 'predictions']]
+    generate_test_run(test, task = "task1", run = "2", model_type = "RF_untuned")
 
     print('bow baseline')
     clf = Pipeline(steps=[('vec', CountVectorizer()), ('clf', MultinomialNB())])
